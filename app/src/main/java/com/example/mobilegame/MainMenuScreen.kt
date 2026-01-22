@@ -27,7 +27,15 @@ fun MainMenuScreen(
             onClick = onStartGame,
             modifier = Modifier.fillMaxWidth(0.7f)
         ) {
-            Text("Start ML Game")
+            Text("Start Game")
+        }
+
+        Button(
+            onClick = {
+
+            },
+            modifier = Modifier.fillMaxWidth(0.7f)){
+            Text("Scores")
         }
 
         OutlinedButton(
