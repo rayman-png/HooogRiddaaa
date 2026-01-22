@@ -56,74 +56,12 @@ import com.example.mobilegame.ui.theme.MobileGameTheme
 
 
 data object Home
-
+@Serializable
+data class MainMenu(val username: String)
+@Serializable
+data class GameSession(val username: String)
 @Serializable
 data class LogIn(val ID:String, val password:String)
-
-object UserManager {
-    private const val FILE_NAME = "users.json"
-
-    // Helper to get the file reference
-    private fun getFile(context: Context): File {
-        val file = File(context.filesDir, FILE_NAME)
-
-        // CREATE IF IT DOESN'T EXIST
-        if (!file.exists()) {
-            file.createNewFile()
-            // Initialize with an empty JSON array so the parser doesn't crash
-            file.writeText("[]")
-        }
-        return file
-    }
-
-    // 1. Register a new user
-    fun registerUser(context: Context, newUser: LogIn): Int {
-        if(newUser.ID == "" || newUser.password == "")
-            return 3
-
-        return try {
-            val file = getFile(context)
-            val jsonString = file.readText()
-
-            // Use a standard List first, then convert to Mutable
-            val userList = if (jsonString.isBlank() || jsonString == "null") {
-                mutableListOf<LogIn>()
-            } else {
-                Json.decodeFromString<List<LogIn>>(jsonString).toMutableList()
-            }
-
-            // Check if user already exists
-            if (userList.any { it.ID == newUser.ID }) return 2
-
-            // Add and save
-            userList.add(newUser)
-            file.writeText(Json.encodeToString(userList))
-            -1 // Success
-        } catch (e: Exception) {
-            e.printStackTrace()
-            3 // Return a new error code for "File/System Error"
-        }
-    }
-
-    // 2. Updated Login check (reads from Internal Storage)
-    fun checkLogin(context: Context, id: String, pass: String): Int {
-        val file = getFile(context)
-
-        // If no users exist at all, the ID definitely isn't there
-        if (!file.exists()) return 0
-
-        val userList = Json.decodeFromString<List<LogIn>>(file.readText())
-
-        // 1. Find if the user ID exists
-        val user = userList.find { it.ID == id }
-
-        return when {
-            user == null -> 0          // ID doesn't exist
-            user.password != pass -> 1 // ID exists, but password is wrong
-            else -> -1                 // Everything matches (Success)
-        }
-    }
-}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -170,12 +108,19 @@ fun NavLogic(modifier: Modifier = Modifier) {
             when(key){
                 is Home -> NavEntry(key){
                     HomeScreen(goNext = {
-                            id,pass -> backstack.add(LogIn(id,pass))
+                            id -> backstack.add(MainMenu(id))
                     },
                         modifier)
                 }
-                is LogIn -> NavEntry(key){
-                    GameStartScreen(login = key, modifier)
+                is MainMenu -> NavEntry(key) {
+                    MainMenuScreen(
+                        username = key.username,
+                        onStartGame = { backstack.add(GameSession(key.username)) },
+                        onLogout = { backstack.removeLastOrNull()}
+                    )
+                }
+                is GameSession -> NavEntry(key) {
+                    GameScreen(username = key.username)
                 }
 
                 else -> NavEntry(key){
@@ -187,93 +132,10 @@ fun NavLogic(modifier: Modifier = Modifier) {
     )
 }
 
-@Composable
-fun HomeScreen(goNext:(String,String)->Unit, modifier: Modifier = Modifier) {
 
-    // save input nric and bool for error
-    var inputID by remember { mutableStateOf("") }
-    var inputPasswd by remember { mutableStateOf("") }
-    var errorID by remember { mutableStateOf(-1) }
-    val context = LocalContext.current // This gets the current Context
-
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxSize()
-    ){
-        // save input as nric
-        TextField(
-            value = inputID,
-            onValueChange = {
-                inputID = it
-            },
-            label = {
-                Text("Username")
-            }
-        )
-
-        TextField(
-            value = inputPasswd,
-            onValueChange = {
-                inputPasswd = it
-            },
-            label = {
-                Text("Password")
-            }
-        )
-
-        Row(){
-
-            Button(
-                onClick = {
-                    val result = UserManager.checkLogin(context, inputID, inputPasswd)
-                    // if matches then go to next screen
-                    if (result == -1) {
-                        android.widget.Toast.makeText(context, "Welcome $inputID!", android.widget.Toast.LENGTH_SHORT).show()
-                        goNext(inputID,inputPasswd)
-                    }
-
-                    errorID = result
-
-                }){
-                Text("Login")
-            }
-
-            // change the input to empty string to clear
-            Button(
-                onClick = {
-                    val result = UserManager.registerUser(context, LogIn(inputID, inputPasswd))
-
-                    if (result == -1) {
-                        android.widget.Toast.makeText(context, "Account Created!", android.widget.Toast.LENGTH_SHORT).show()
-                        inputID = ""
-                        inputPasswd = ""
-                    }
-
-                    errorID = result
-                }){
-                Text("Register")
-            }
-        }
-        // if error then show error message
-        if(errorID == 0) {
-            Text("Username Doesn't Exist", color = Color.Red)
-        }
-        if(errorID == 1) {
-            Text("Incorrect Password", color = Color.Red)
-        }
-        if(errorID == 2) {
-            Text("Username Already Exists", color = Color.Red)
-        }
-        if(errorID == 3) {
-            Text("System Error: Could not save user", color = Color.Red)
-        }
-    }
-}
 
 @Composable
-fun GameStartScreen(login:LogIn, modifier: Modifier = Modifier) {
+fun MainMenuScreen(login:LogIn, modifier: Modifier = Modifier) {
 
     val context = LocalContext.current
     Column(

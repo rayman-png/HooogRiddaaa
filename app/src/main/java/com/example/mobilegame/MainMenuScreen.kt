@@ -1,0 +1,40 @@
+package com.example.mobilegame
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun MainMenuScreen(
+    username: String,
+    onStartGame: () -> Unit,
+    onLogout: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Welcome, $username!", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = onStartGame,
+            modifier = Modifier.fillMaxWidth(0.7f)
+        ) {
+            Text("Start ML Game")
+        }
+
+        OutlinedButton(
+            onClick = onLogout,
+            modifier = Modifier.fillMaxWidth(0.7f)
+        ) {
+            Text("Logout")
+        }
+    }
+}
