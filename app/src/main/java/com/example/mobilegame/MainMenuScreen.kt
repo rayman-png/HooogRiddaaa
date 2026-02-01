@@ -19,7 +19,7 @@ fun MainMenuScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Welcome, $username!", style = MaterialTheme.typography.headlineMedium)
+        Text(text = "Welcome, $username To the Scavenger Hunt!", style = MaterialTheme.typography.headlineSmall)
 
         Spacer(modifier = Modifier.height(32.dp))
 
