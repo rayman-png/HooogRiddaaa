@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun MainMenuScreen(
     username: String,
-    onStartGame: () -> Unit,
+    onGameMenu: () -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -24,7 +24,7 @@ fun MainMenuScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = onStartGame,
+            onClick = onGameMenu,
             modifier = Modifier.fillMaxWidth(0.7f)
         ) {
             Text("Start Game")

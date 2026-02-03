@@ -59,7 +59,9 @@ data object Home
 @Serializable
 data class MainMenu(val username: String)
 @Serializable
-data class GameSession(val username: String)
+data class GameHome(val username: String)
+@Serializable
+data class GameSession(val username: String, val category: String)
 @Serializable
 data class LogIn(val ID:String, val password:String)
 
@@ -115,12 +117,19 @@ fun NavLogic(modifier: Modifier = Modifier) {
                 is MainMenu -> NavEntry(key) {
                     MainMenuScreen(
                         username = key.username,
-                        onStartGame = { backstack.add(GameSession(key.username)) },
+                        onGameMenu = { backstack.add(GameHome(key.username)) },
                         onLogout = { backstack.removeLastOrNull()}
                     )
                 }
+                is GameHome ->NavEntry(key){
+                    CategoryScreen(
+                        onCategorySelected = { category ->
+                            backstack.add(GameSession(key.username, category))
+                        }
+                    )
+                }
                 is GameSession -> NavEntry(key) {
-                    GameScreen(username = key.username)
+                    GameScreen(username = key.username, category = key.category)
                 }
 
                 else -> NavEntry(key){

@@ -22,15 +22,15 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun GameScreen(username: String, modifier: Modifier = Modifier) {
+fun GameScreen(username: String,category: String, modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val targetObject = "Coffee mug" // This would eventually come from your game logic
 
-    // State to track the win
+    // should be getting one from a list based on category
+    val targetObject = "Coffee mug"
+
     var winMessage by remember { mutableStateOf("Find a $targetObject!") }
     var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Define the launcher HERE so the button can see it
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
@@ -48,7 +48,7 @@ fun GameScreen(username: String, modifier: Modifier = Modifier) {
             onClick = {
                 val uri = createTempImageUri(context)
                 capturedImageUri = uri
-                cameraLauncher.launch(uri) // Launch the camera!
+                cameraLauncher.launch(uri)
             },
             modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp)
         ) {
