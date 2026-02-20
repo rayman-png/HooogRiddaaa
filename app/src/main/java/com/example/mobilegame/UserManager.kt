@@ -2,8 +2,11 @@ package com.example.mobilegame
 
 import android.content.Context
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.File
+
+import com.example.mobilegame.LogIn
 
 object UserManager {
     private const val FILE_NAME = "users.json"
