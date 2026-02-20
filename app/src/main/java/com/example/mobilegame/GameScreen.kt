@@ -132,9 +132,8 @@ fun GameScreen(
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(25.dp))
 
-            // NEW: Show Current Category
             Text(
                 text = "Category: $category",
                 style = MaterialTheme.typography.bodyMedium,
