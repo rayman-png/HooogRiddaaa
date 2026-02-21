@@ -31,7 +31,7 @@ fun CategoryScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Select a Category", style = MaterialTheme.typography.labelSmall)
+        Text("Select a Category To Start With", style = MaterialTheme.typography.labelSmall)
         Spacer(modifier = Modifier.height(24.dp))
 
         categories.forEach { category ->

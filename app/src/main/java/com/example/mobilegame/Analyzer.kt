@@ -2,7 +2,6 @@ package com.example.mobilegame
 
 import android.content.Context
 import android.net.Uri
-import androidx.compose.runtime.Composable
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabeling
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
@@ -10,21 +9,35 @@ import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 fun analyzePhoto(
     context: Context,
     uri: Uri,
-    target: String,
-    onResult: (Boolean, Float) -> Unit
+    validTargets: List<String>,
+    // onResult returns: (isFound, confidence, topDetectedLabel)
+    onResult: (Boolean, Float, String?) -> Unit
 ) {
-    val image = InputImage.fromFilePath(context, uri)
-    val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+    try {
+        val image = InputImage.fromFilePath(context, uri)
+        val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
 
-    labeler.process(image)
-        .addOnSuccessListener { labels ->
-            val match = labels.find {
-                it.text.contains(target, ignoreCase = true) && it.confidence >= 0.8f
+        labeler.process(image)
+            .addOnSuccessListener { labels ->
+                // 1. Look for a match among our valid synonyms
+                val match = labels.find { detectedLabel ->
+                    validTargets.any { validTarget ->
+                        detectedLabel.text.equals(validTarget, ignoreCase = true)
+                    } && detectedLabel.confidence >= 0.7f
+                }
+
+                if (match != null) {
+                    onResult(true, match.confidence, match.text)
+                } else {
+                    // 2. If no match, find the most confident label for cheeky feedback
+                    val topLabel = labels.maxByOrNull { it.confidence }?.text
+                    onResult(false, 0f, topLabel)
+                }
             }
-            if (match != null) {
-                onResult(true, match.confidence)
-            } else {
-                onResult(false, 0f)
+            .addOnFailureListener {
+                onResult(false, 0f, "Error: ${it.message}")
             }
-        }
+    } catch (e: Exception) {
+        onResult(false, 0f, "Error: ${e.message}")
+    }
 }
