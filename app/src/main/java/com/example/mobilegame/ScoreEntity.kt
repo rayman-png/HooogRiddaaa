@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class ScoreEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val score: Int,
-    val date: Long // Store as timestamp
+    val date: Long,
+    val username: String
 )

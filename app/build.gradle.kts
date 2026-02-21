@@ -70,6 +70,7 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     // Room
     implementation(libs.androidx.room.runtime)
@@ -77,4 +78,6 @@ dependencies {
     annotationProcessor(libs.androidx.room.compiler)
     testImplementation(libs.androidx.room.testing)
     implementation(libs.androidx.room.paging)
+
+    implementation(libs.androidx.datastore.preferences)
 }

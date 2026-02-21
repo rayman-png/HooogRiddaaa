@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 
-@Composable
+/*@Composable
 fun GeneratorHighScreen(
     viewModel: MainViewModel = viewModel(),
     onNavigationToDisplay: () -> Unit
@@ -20,7 +20,9 @@ fun GeneratorHighScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Button(onClick = { viewModel.insertRandomScore() }) {
+        Button(onClick = {
+            viewModel.insertRandomScore()
+        }) {
             Text("Generate Random Score")
         }
 
@@ -28,4 +30,4 @@ fun GeneratorHighScreen(
             Text("View Leaderboard")
         }
     }
-}
+}*/

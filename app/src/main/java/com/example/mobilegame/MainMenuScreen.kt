@@ -12,6 +12,7 @@ fun MainMenuScreen(
     username: String,
     onGameMenu: () -> Unit,
     onLogout: () -> Unit,
+    onShowScores: () -> Unit, // Added this
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -31,10 +32,9 @@ fun MainMenuScreen(
         }
 
         Button(
-            onClick = {
-
-            },
-            modifier = Modifier.fillMaxWidth(0.7f)){
+            onClick = onShowScores, // Updated this
+            modifier = Modifier.fillMaxWidth(0.7f)
+        ) {
             Text("Scores")
         }
 

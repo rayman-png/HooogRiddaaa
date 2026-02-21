@@ -16,6 +16,12 @@ interface ScoreDAO {
     @Query("SELECT * FROM score_table ORDER BY score DESC")
     fun getAllScoresByHighScore(): Flow<List<ScoreEntity>>
 
+    @Query("SELECT * FROM score_table ORDER BY username ASC")
+    fun getAllScoresByName(): Flow<List<ScoreEntity>>
+
+    @Query("SELECT * FROM score_table")
+    fun getAllScores(): Flow<List<ScoreEntity>>
+
     @Insert
     suspend fun insert(score: ScoreEntity)
 
