@@ -62,11 +62,15 @@ data object Home
 @Serializable
 data class MainMenu(val username: String)
 @Serializable
-data class GameFlowRoute(val username: String)
+data class GameFlowRoute(val username: String, val mode: String)
 @Serializable
 data class HighScores(val username: String)
 @Serializable
 data class LogIn(val ID: String, val password: String)
+
+@Serializable
+data class GameModeSelection(val username:String)
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,9 +115,17 @@ fun NavLogic(modifier: Modifier = Modifier) {
                 is MainMenu -> NavEntry(key) {
                     MainMenuScreen(
                         username = key.username,
-                        onGameMenu = { backstack.add(GameFlowRoute(key.username)) },
+                        onGameMenu = { backstack.add(GameModeSelection(key.username)) },
                         onShowScores = { backstack.add(HighScores(username = key.username)) },
                         onLogout = { backstack.removeLastOrNull() }
+                    )
+                }
+                is GameModeSelection -> NavEntry(key) {
+                    GameModeSelectionScreen(
+                        onModeSelected = { selectedMode ->
+                            backstack.add(GameFlowRoute(key.username, mode = selectedMode))
+                        },
+                        onBack = { backstack.removeLastOrNull() }
                     )
                 }
                 is HighScores -> NavEntry(key) {
@@ -123,6 +135,7 @@ fun NavLogic(modifier: Modifier = Modifier) {
                 is GameFlowRoute -> NavEntry(key) {
                     GameFlowManager(
                         username = key.username,
+                        gameMode = key.mode,
                         onGameFinished = { backstack.removeLastOrNull() }
                     )
                 }
@@ -203,6 +216,7 @@ fun LevelTransitionScreen(
 @Composable
 fun GameFlowManager(
     username: String,
+    gameMode: String,
     onGameFinished: () -> Unit
 ) {
     var currentLevel by remember { mutableStateOf(0) }
@@ -237,20 +251,37 @@ fun GameFlowManager(
                 )
             }
             1, 2, 3 -> {
-                GameScreen(
-                    username = username,
-                    category = currentCategory,
-                    level = currentLevel,
-                    onLevelComplete = {
-                        if (currentLevel == 3) {
-                            onGameFinished()
-                        } else {
-                            val remainingCategories = allCategories - playedCategories
-                            upcomingCategory = remainingCategories.random()
-                            isTransitioning = true
+                // Determine which screen to show based on gameMode
+                if (gameMode == "Category Shuffle") {
+                    CategoryShuffleScreen(
+                        username = username,
+                        category = currentCategory,
+                        level = currentLevel,
+                        onLevelComplete = {
+                            if (currentLevel == 3) {
+                                onGameFinished()
+                            } else {
+                                val remainingCategories = allCategories - playedCategories
+                                upcomingCategory = remainingCategories.random()
+                                isTransitioning = true
+                            }
                         }
-                    }
-                )
+                    )
+                } else {
+                    // This handles the "Mystery Hunt" choice
+                    MysteryHuntScreen(
+                        username = username,
+                        category = currentCategory,
+                        level = currentLevel,
+                        onLevelComplete = {
+                            if (currentLevel == 3) {
+                                onGameFinished()
+                            } else {
+                                currentLevel++
+                            }
+                        }
+                    )
+                }
             }
         }
     }
