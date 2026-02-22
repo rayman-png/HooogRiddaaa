@@ -33,33 +33,7 @@ fun GameScreen(
 ) {
     val context = LocalContext.current
 
-    val categoryTargets = remember {
-        mapOf(
-            "Nature" to mapOf(
-                "Houseplant" to listOf("Houseplant", "Potted plant", "Vase"),
-                "Flower" to listOf("Flower", "Petal", "Blossom", "Rose", "Daisy"),
-                "Bird" to listOf("Bird", "Beak", "Feather", "Wing"),
-                "Soil" to listOf("Soil", "Dirt", "Ground", "Mud")
-            ),
-            "Kitchen" to mapOf(
-                "Coffee Mug" to listOf("Mug", "Cup", "Coffee cup"),
-                "Fruit" to listOf("Fruit", "Apple", "Banana", "Orange", "Citrus"),
-                "Bread" to listOf("Bread", "Toast", "Bakery", "Loaf", "Baguette")
-            ),
-            "Office" to mapOf(
-                "Television" to listOf("Television", "Monitor", "Screen", "Tv"),
-                "Chair" to listOf("Chair", "Seat", "Stool", "Armchair"),
-                "Mobile phone" to listOf("Mobile phone", "Smartphone", "Telephone", "Cell phone"),
-                "Computer" to listOf("Computer", "Laptop", "Keyboard", "Desktop")
-            ),
-            "Pets" to mapOf(
-                "Dog" to listOf("Dog", "Canine", "Puppy", "Hound"),
-                "Cat" to listOf("Cat", "Feline", "Kitten", "Tabby")
-            )
-        )
-    }
-
-    val targets = categoryTargets[category] ?: categoryTargets["Office"]!!
+    val targets = GameLibrary.categoryTargets[category] ?: GameLibrary.categoryTargets["Office"]!!
     val targetKeys = targets.keys.toList()
     var targetObject by remember(category) { mutableStateOf(targetKeys.random()) }
 
@@ -81,23 +55,24 @@ fun GameScreen(
         isProcessing = true
         showConfetti = false
 
-        val validSynonyms = targets[targetObject] ?: listOf(targetObject)
+        val currentDataTarget = GameLibrary.categoryTargets[category]?.get(targetObject)
 
-        analyzePhoto(context, uri, validSynonyms) { found, confidence, topLabel ->
-            isProcessing = false
-            if (found) {
-                statusMessage = "Success! You found the $targetObject! 🎉"
-                showConfetti = true
-            } else {
-                statusMessage = if (topLabel != null && !topLabel.startsWith("Error")) {
-                    "Hmm... that looks like a $topLabel, not a $targetObject. Try again!"
+        if (currentDataTarget != null) {
+            analyzePhoto(context, uri, currentDataTarget) { found, confidence, topLabel ->
+                isProcessing = false
+                if (found) {
+                    statusMessage = "Success! You found the $targetObject! 🎉"
+                    showConfetti = true
                 } else {
-                    "I couldn't recognize anything clearly. Try again!"
+                    statusMessage = if (topLabel != null && !topLabel.startsWith("Error")) {
+                        "Hmm... that looks like a $topLabel, not a $targetObject. Try again!"
+                    } else {
+                        "I couldn't recognize anything clearly. Try again!"
+                    }
                 }
             }
         }
     }
-
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
