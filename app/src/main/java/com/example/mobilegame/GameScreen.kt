@@ -8,7 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +28,10 @@ fun CategoryShuffleScreen(
     username: String,
     category: String,
     level: Int,
+    score: Int,
+    timeLeft: Int,
+    onTargetFound: (Int) -> Unit,
+    onSkip: () -> Unit,
     onLevelComplete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -61,6 +65,7 @@ fun CategoryShuffleScreen(
             analyzePhoto(context, uri, currentDataTarget) { found, confidence, topLabel ->
                 isProcessing = false
                 if (found) {
+                    onTargetFound(timeLeft)
                     statusMessage = "Success! You found the $targetObject! 🎉"
                     showConfetti = true
                 } else {
@@ -99,6 +104,14 @@ fun CategoryShuffleScreen(
                 text = "Level $level of 3",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.secondary
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Score: $score   •   Time Left: ${timeLeft}s",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
             )
 
             Text(
@@ -178,10 +191,11 @@ fun CategoryShuffleScreen(
 
                 IconButton(onClick = {
                     targetObject = targetKeys.random()
+                    onSkip()
                     statusMessage = "Find a $targetObject!"
                     showConfetti = false
                 }) {
-                    Icon(Icons.Filled.Refresh, contentDescription = "New Target", tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Filled.SkipNext, contentDescription = "Skip target", tint = MaterialTheme.colorScheme.primary)
                 }
             }
         }
@@ -207,6 +221,10 @@ fun MysteryHuntScreen(
     username: String,
     category: String,
     level: Int,
+    score: Int,
+    timeLeft: Int,
+    onTargetFound: (Int) -> Unit,
+    onSkip: () -> Unit,
     onLevelComplete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -267,6 +285,7 @@ fun MysteryHuntScreen(
             analyzePhoto(context, uri, currentData) { found, confidence, topLabel ->
                 isProcessing = false
                 if (found) {
+                    onTargetFound(timeLeft)
                     persistedUsedTargets.add(targetObject)
                     persistedWonTargets.add(targetObject)
                     statusMessage = "Correct! It was a $targetObject!"
@@ -310,6 +329,16 @@ fun MysteryHuntScreen(
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.secondary
             )
+
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Score: $score   •   Time Left: ${timeLeft}s",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+
             Text(
                 text = "Mystery Hunt",
                 style = MaterialTheme.typography.headlineMedium,
@@ -423,6 +452,7 @@ fun MysteryHuntScreen(
                 // 3. Refresh Button
                 FilledIconButton(
                     onClick = {
+                        onSkip()
                         // Never return current item or won items
                         val remaining = targetKeys.filter {
                             it != targetObject && it !in persistedWonTargets
@@ -442,7 +472,7 @@ fun MysteryHuntScreen(
                         statusMessage = "Target Refreshed!"
                     }
                 ) {
-                    Icon(Icons.Filled.Refresh, contentDescription = "Refresh Target")
+                    Icon(Icons.Filled.SkipNext, contentDescription = "Skip Target")
                 }
             }
         } // End of Column

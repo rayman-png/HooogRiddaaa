@@ -6,14 +6,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.math.max
 
 @Composable
 fun LevelTransitionScreen(
     nextCategory: String,
     allCategories: List<String>,
+    currentScore: Int,
     onTransitionFinished: () -> Unit
 ) {
     var displayedCategory by remember { mutableStateOf(allCategories.random()) }
@@ -53,6 +57,14 @@ fun LevelTransitionScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        Text(
+            text = "Current Score: $currentScore",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
         Card(
             modifier = Modifier
                 .fillMaxWidth(0.8f)
@@ -83,19 +95,64 @@ fun GameFlowManager(
     gameMode: String,
     onGameFinished: () -> Unit
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val scoreDao = remember(context) { ScoreDatabase.getDatabase(context).scoreDao() }
+
     var currentLevel by remember { mutableStateOf(0) }
     var currentCategory by remember { mutableStateOf("") }
     var playedCategories by remember { mutableStateOf(setOf<String>()) }
+
+    var currentScore by remember { mutableStateOf(0) }
+    var timeLeft by remember { mutableStateOf(60) }
+    var gameEnded by remember { mutableStateOf(false) }
 
     var isTransitioning by remember { mutableStateOf(false) }
     var upcomingCategory by remember { mutableStateOf("") }
 
     val allCategories = listOf("Nature", "Kitchen", "Office", "Pets")
 
+    fun completeGame() {
+        if (gameEnded) return
+        gameEnded = true
+        scope.launch {
+            scoreDao.insert(
+                ScoreEntity(
+                    score = max(0, currentScore),
+                    date = System.currentTimeMillis(),
+                    username = username
+                )
+            )
+            onGameFinished()
+        }
+    }
+
+    LaunchedEffect(currentLevel, isTransitioning, gameEnded) {
+        if (gameEnded || isTransitioning || currentLevel !in 1..3) return@LaunchedEffect
+        timeLeft = 60
+        while (timeLeft > 0 && !gameEnded && !isTransitioning) {
+            delay(1000L)
+            timeLeft -= 1
+        }
+        if (timeLeft <= 0 && !gameEnded) {
+            completeGame()
+        }
+    }
+
+    val onTargetFound: (Int) -> Unit = { remainingTime ->
+        val earned = 100 + (remainingTime * 5)
+        currentScore += earned
+    }
+
+    val onSkip: () -> Unit = {
+        currentScore = max(0, currentScore - 25)
+    }
+
     if (isTransitioning) {
         LevelTransitionScreen(
             nextCategory = upcomingCategory,
             allCategories = allCategories,
+            currentScore = currentScore,
             onTransitionFinished = {
                 currentCategory = upcomingCategory
                 playedCategories = playedCategories + upcomingCategory
@@ -121,9 +178,13 @@ fun GameFlowManager(
                         username = username,
                         category = currentCategory,
                         level = currentLevel,
+                        score = currentScore,
+                        timeLeft = timeLeft,
+                        onTargetFound = onTargetFound,
+                        onSkip = onSkip,
                         onLevelComplete = {
                             if (currentLevel == 3) {
-                                onGameFinished()
+                                completeGame()
                             } else {
                                 val remainingCategories = allCategories - playedCategories
                                 upcomingCategory = remainingCategories.random()
@@ -137,9 +198,13 @@ fun GameFlowManager(
                         username = username,
                         category = currentCategory,
                         level = currentLevel,
+                        score = currentScore,
+                        timeLeft = timeLeft,
+                        onTargetFound = onTargetFound,
+                        onSkip = onSkip,
                         onLevelComplete = {
                             if (currentLevel == 3) {
-                                onGameFinished()
+                                completeGame()
                             } else {
                                 currentLevel++
                             }

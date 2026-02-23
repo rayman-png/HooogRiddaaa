@@ -49,6 +49,11 @@ object GameLibrary {
                 synonyms = listOf("Bread", "Toast", "Bakery", "Loaf", "Baguette"),
                 hint1Vague = "The basic ingredient for a sandwich.",
                 hint2Direct = "It's baked dough that smells amazing when toasted."
+            ),
+            "Bottle" to ScavengerTarget(
+                synonyms = listOf("Bottle", "Water bottle", "Flask"),
+                hint1Vague = "A portable container used to keep you hydrated.",
+                hint2Direct = "Usually has a narrow neck and a cap."
             )
         ),
 
@@ -72,6 +77,11 @@ object GameLibrary {
                 synonyms = listOf("Computer", "Laptop", "Keyboard", "Desktop"),
                 hint1Vague = "The brain of the modern office.",
                 hint2Direct = "It has a keyboard and a screen; used for work or gaming."
+            ),
+            "Book" to ScavengerTarget(
+                synonyms = listOf("Book", "Notebook", "Textbook"),
+                hint1Vague = "A silent teacher filled with pages.",
+                hint2Direct = "Look for a stack of paper bound together with a cover."
             )
         ),
 
@@ -87,6 +97,12 @@ object GameLibrary {
                 threshold = 0.85f,
                 hint1Vague = "A sophisticated hunter that loves to nap in sunbeams.",
                 hint2Direct = "It has whiskers, pointy ears, and might purr when petted."
+            ),
+            "Bird" to ScavengerTarget(
+                synonyms = listOf("Bird", "Parrot", "Finch"),
+                threshold = 0.75f,
+                hint1Vague = "A tiny singer with feathers and wings.",
+                hint2Direct = "Can perch, chirp, and fly around the house or outdoors."
             )
         )
     )

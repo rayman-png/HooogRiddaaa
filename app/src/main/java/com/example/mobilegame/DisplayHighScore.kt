@@ -10,7 +10,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -50,10 +49,7 @@ fun DisplayHighScore(username: String) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
         ) {
-            // Debug and Clear Buttons
-            Button(onClick = { viewModel.insertDebugScore() }, colors = ButtonDefaults.buttonColors(containerColor = Color.Magenta)) {
-                Text("Debug")
-            }
+            Text("Leaderboard", style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.weight(1f))
             Button(onClick = { viewModel.deleteAll() }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) {
                 Text("Clear")
