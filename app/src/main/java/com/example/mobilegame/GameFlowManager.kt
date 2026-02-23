@@ -104,13 +104,14 @@ fun GameFlowManager(
     var playedCategories by remember { mutableStateOf(setOf<String>()) }
 
     var currentScore by remember { mutableStateOf(0) }
-    var timeLeft by remember { mutableStateOf(60) }
+    var timeLeft by remember { mutableStateOf(150) }
     var gameEnded by remember { mutableStateOf(false) }
 
     var isTransitioning by remember { mutableStateOf(false) }
     var upcomingCategory by remember { mutableStateOf("") }
 
     val allCategories = listOf("Nature", "Kitchen", "Office", "Pets")
+    val SKIP_COST = 50
 
     fun completeGame() {
         if (gameEnded) return
@@ -129,7 +130,7 @@ fun GameFlowManager(
 
     LaunchedEffect(currentLevel, isTransitioning, gameEnded) {
         if (gameEnded || isTransitioning || currentLevel !in 1..3) return@LaunchedEffect
-        timeLeft = 60
+        timeLeft = 150
         while (timeLeft > 0 && !gameEnded && !isTransitioning) {
             delay(1000L)
             timeLeft -= 1
@@ -145,7 +146,9 @@ fun GameFlowManager(
     }
 
     val onSkip: () -> Unit = {
-        currentScore = max(0, currentScore - 25)
+        if (currentScore >= SKIP_COST) {
+            currentScore -= SKIP_COST
+        }
     }
 
     if (isTransitioning) {

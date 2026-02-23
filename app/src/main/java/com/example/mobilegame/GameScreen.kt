@@ -189,13 +189,20 @@ fun CategoryShuffleScreen(
                     Text("Gallery")
                 }
 
-                IconButton(onClick = {
-                    targetObject = targetKeys.random()
-                    onSkip()
-                    statusMessage = "Find a $targetObject!"
-                    showConfetti = false
-                }) {
-                    Icon(Icons.Filled.SkipNext, contentDescription = "Skip target", tint = MaterialTheme.colorScheme.primary)
+                IconButton(
+                    onClick = {
+                        targetObject = targetKeys.random()
+                        onSkip()
+                        statusMessage = "Find a $targetObject!"
+                        showConfetti = false
+                    },
+                    enabled = score >= 50
+                ) {
+                    Icon(
+                        Icons.Filled.SkipNext,
+                        contentDescription = "Skip target",
+                        tint = if (score >= 50) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                    )
                 }
             }
         }
@@ -470,7 +477,8 @@ fun MysteryHuntScreen(
                         targetObject = next
                         showSecondHint = false
                         statusMessage = "Target Refreshed!"
-                    }
+                    },
+                    enabled = score >= 50
                 ) {
                     Icon(Icons.Filled.SkipNext, contentDescription = "Skip Target")
                 }
