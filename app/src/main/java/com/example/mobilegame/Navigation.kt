@@ -20,6 +20,10 @@ data class MainMenu(val username: String)
 data class GameFlowRoute(val username: String, val mode: String)
 
 @Serializable
+data class Tutorial (val username: String)
+
+
+@Serializable
 data class HighScores(val username: String)
 
 @Serializable
@@ -49,6 +53,7 @@ fun NavLogic(modifier: Modifier = Modifier) {
                     MainMenuScreen(
                         username = key.username,
                         onGameMenu = { backstack.add(GameModeSelection(key.username)) },
+                        onTutorial = { backstack.add(Tutorial(key.username)) },
                         onShowScores = { backstack.add(HighScores(username = key.username)) },
                         onLogout = { backstack.removeLastOrNull() }
                     )
@@ -63,6 +68,13 @@ fun NavLogic(modifier: Modifier = Modifier) {
                 }
                 is HighScores -> NavEntry(key) {
                     DisplayHighScore(username = key.username)
+                }
+
+                is Tutorial -> NavEntry(key){
+                    TutorialScreen(
+                        username = key.username,
+                        onBack = { backstack.removeLastOrNull() }
+                    )
                 }
 
                 is GameFlowRoute -> NavEntry(key) {

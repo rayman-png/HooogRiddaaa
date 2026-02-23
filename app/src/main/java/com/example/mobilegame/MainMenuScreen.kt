@@ -13,6 +13,7 @@ fun MainMenuScreen(
     username: String,
     onGameMenu: () -> Unit,
     onLogout: () -> Unit,
+    onTutorial: () -> Unit,
     onShowScores: () -> Unit, // Added this
     modifier: Modifier = Modifier
 ) {
@@ -40,6 +41,13 @@ fun MainMenuScreen(
             modifier = Modifier.fillMaxWidth(0.7f)
         ) {
             Text("Scores")
+        }
+
+        Button(
+            onClick = onTutorial, // Updated this
+            modifier = Modifier.fillMaxWidth(0.7f)
+        ) {
+            Text("How To Play")
         }
 
         OutlinedButton(
